@@ -13,7 +13,7 @@ export const getClients = async () => {
 export const createClient = async (data) => {
   try {
     const { name, email, job, isactive } = data
-    const { rows } = await query(`INSERT INTO clients_tb (name, email, job, isactive) VALUES ($1, $2, $3, $5) RETURNING *`, [name, email, job, isactive]);
+    const { rows } = await query(`INSERT INTO clients_tb (name, email, job, isactive) VALUES ($1, $2, $3, $4) RETURNING *`, [name, email, job, isactive]);
     return rows[0];
   } catch (error) {
     console.error('Error al insertar cliente en la base de datos' + error);

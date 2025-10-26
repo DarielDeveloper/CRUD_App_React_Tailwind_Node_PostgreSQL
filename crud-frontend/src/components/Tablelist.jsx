@@ -1,49 +1,46 @@
-const clients = [
-  {
-    id: 1,
-    name: "Creola Katherine Johnson",
-    email: "alice.johnson@example.com",
-    profession: "mathematician",
-    accomplishment: "spaceflight calculations",
-    activated: true,
-  },
-  {
-    id: 2,
-    name: "Mario José Molina-Pasquel Henríquez",
-    email: "alice.johnson@example.com",
-    profession: "chemist",
-    accomplishment: "discovery of Arctic ozone hole",
-    activated: true,
-  },
-  {
-    id: 3,
-    name: "Mohammad Abdus Salam",
-    email: "alice.johnson@example.com",
-    profession: "physicist",
-    accomplishment: "electromagnetism theory",
-    activated: false,
-  },
-  {
-    id: 4,
-    name: "Percy Lavon Julian",
-    email: "alice.johnson@example.com",
-    profession: "chemist",
-    accomplishment:
-      "pioneering cortisone drugs, steroids and birth control pills",
-    activated: false,
-  },
-  {
-    id: 5,
-    name: "Subrahmanyan Chandrasekhar",
-    profession: "astrophysicist",
-    accomplishment: "white dwarf star mass calculations",
-    activated: true,
-  },
-];
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function Tablelist({ handleOpen }) {
+export default function Tablelist({ handleOpen, searchTerm }) {
+  const [tableData, setTableData] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fechtData = async () => {
+      try {
+        const result = await axios.get("http://localhost:3000/api/clients");
+        setTableData(result.data);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+    fechtData();
+  }, []);
+
+  //Filter data for term search
+  const filterDataSearch = tableData.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.job.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleDeleted = async ({ id, name }) => {
+    const confirm = window.confirm(
+      `¿Estas seguro de eliminar el cliente ${name} ?`
+    );
+    if (confirm) {
+      try {
+        await axios.delete(`http://localhost:3000/api/clients/${id}`);
+        setTableData(tableData.filter((client) => client.id !== id));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
   return (
     <>
+      {error && <div className="alert alert-error ">{error}</div>}
       <div className="overflow-x-auto mt-10 ">
         <table className="table bg-slate-800">
           {/* head */}
@@ -51,39 +48,44 @@ export default function Tablelist({ handleOpen }) {
             <tr>
               <th>Id</th>
               <th>Name</th>
+              <th>Email</th>
               <th>Job</th>
-              <th>Application</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody className="hover">
-            {clients.map((client) => (
+            {filterDataSearch.map((client) => (
               <tr key={client.id}>
                 <th>{client.id}</th>
                 <td>{client.name} </td>
-                <td>{client.profession}</td>
-                <td>{client.accomplishment}</td>
+                <td>{client.email}</td>
+                <td>{client.job}</td>
                 <td>
                   <button
                     className={`btn rounded-full w-20 ${
-                      client.activated
+                      client.isactive
                         ? "btn-primary"
                         : "btn-outline btn-primary"
                     }`}
                   >
-                    {client.activated ? "Active" : "Inactive"}
+                    {client.isactive ? "Active" : "Inactive"}
                   </button>
                 </td>
                 <td>
                   <button
-                    onClick={() => handleOpen("edit")}
+                    onClick={() => handleOpen("edit", client)}
                     className="btn btn-secondary"
                   >
                     Update
                   </button>
                 </td>
                 <td>
-                  <button className="btn btn-error">Delete</button>
+                  <button
+                    className="btn btn-error"
+                    onClick={() => handleDeleted(client)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

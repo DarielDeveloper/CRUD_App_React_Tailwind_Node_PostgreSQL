@@ -15,7 +15,3 @@ server.listen(PORT, () => {
 
 
 
-server.get('/create_task', (req, res) => {
-  res.send(`<h1> Crear tareas</h1>`)
-});
-
