@@ -31,9 +31,6 @@ export default function ModalForm({
   };
 
   useEffect(() => {
-    console.log("efect modal");
-    console.log(clientData);
-
     if (mode == "edit" && clientData) {
       console.log("hola modal edit");
 

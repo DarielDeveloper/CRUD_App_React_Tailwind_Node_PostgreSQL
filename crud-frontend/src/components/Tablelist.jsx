@@ -1,22 +1,12 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function Tablelist({ handleOpen, searchTerm }) {
-  const [tableData, setTableData] = useState([]);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fechtData = async () => {
-      try {
-        const result = await axios.get("http://localhost:3000/api/clients");
-        setTableData(result.data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
-    fechtData();
-  }, []);
-
+export default function Tablelist({
+  handleOpen,
+  searchTerm,
+  errorTable,
+  tableData,
+  setTableData,
+}) {
   //Filter data for term search
   const filterDataSearch = tableData.filter(
     (client) =>
@@ -40,7 +30,7 @@ export default function Tablelist({ handleOpen, searchTerm }) {
   };
   return (
     <>
-      {error && <div className="alert alert-error ">{error}</div>}
+      {errorTable && <div className="alert alert-error ">{errorTable}</div>}
       <div className="overflow-x-auto mt-10 ">
         <table className="table bg-slate-800">
           {/* head */}
